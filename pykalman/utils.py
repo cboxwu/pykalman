@@ -29,9 +29,9 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 # DAMAGE.
-'''
+"""
 Utility functions taken from scikit-learn
-'''
+"""
 
 import inspect
 import itertools
@@ -50,9 +50,9 @@ def array2d(X, dtype=None, order=None):
     return np.asarray(np.atleast_2d(X), dtype=dtype, order=order)
 
 
-def log_multivariate_normal_density(X, means, covars, min_covar=1.e-7):
-    """Log probability for full covariance matrices. """
-    if hasattr(linalg, 'solve_triangular'):
+def log_multivariate_normal_density(X, means, covars, min_covar=1.0e-7):
+    """Log probability for full covariance matrices."""
+    if hasattr(linalg, "solve_triangular"):
         # only in scipy since 0.9
         solve_triangular = linalg.solve_triangular
     else:
@@ -67,12 +67,10 @@ def log_multivariate_normal_density(X, means, covars, min_covar=1.e-7):
         except linalg.LinAlgError:
             # The model is most probabily stuck in a component with too
             # few observations, we need to reinitialize this components
-            cv_chol = linalg.cholesky(cv + min_covar * np.eye(n_dim),
-                                      lower=True)
+            cv_chol = linalg.cholesky(cv + min_covar * np.eye(n_dim), lower=True)
         cv_log_det = 2 * np.sum(np.log(np.diagonal(cv_chol)))
         cv_sol = solve_triangular(cv_chol, (X - mu).T, lower=True).T
-        log_prob[:, c] = - .5 * (np.sum(cv_sol ** 2, axis=1) + \
-                                     n_dim * np.log(2 * np.pi) + cv_log_det)
+        log_prob[:, c] = -0.5 * (np.sum(cv_sol**2, axis=1) + n_dim * np.log(2 * np.pi) + cv_log_det)
 
     return log_prob
 
@@ -91,8 +89,7 @@ def check_random_state(seed):
         return np.random.RandomState(seed)
     if isinstance(seed, np.random.RandomState):
         return seed
-    raise ValueError('{0} cannot be used to seed a numpy.random.RandomState'
-                     + ' instance').format(seed)
+    raise ValueError("{0} cannot be used to seed a numpy.random.RandomState" + " instance").format(seed)
 
 
 class Bunch(dict):
@@ -105,11 +102,11 @@ class Bunch(dict):
 
 
 def get_params(obj):
-    '''Get names and values of all parameters in `obj`'s __init__'''
+    """Get names and values of all parameters in `obj`'s __init__"""
     try:
         # get names of every variable in the argument
-        args = inspect.getargspec(obj.__init__)[0]
-        args.pop(0)   # remove "self"
+        args = inspect.getfullargspec(obj.__init__)[0]
+        args.pop(0)  # remove "self"
 
         # get values for each of the above in the object
         argdict = dict([(arg, obj.__getattribute__(arg)) for arg in args])
